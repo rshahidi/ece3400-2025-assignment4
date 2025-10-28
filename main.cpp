@@ -1,7 +1,6 @@
 #include "PPP/Window.h"
 #include "PPP/Graph.h"
-#include "Smiley.h"
-#include "Frowny.h"
+#include "Clock.h"
 
 using namespace Graph_lib;
 int main(int /*argc*/, char* /*argv*/[])
@@ -12,36 +11,46 @@ int main(int /*argc*/, char* /*argv*/[])
     Rectangle r({ 10, 10 }, 120, 220);
     r.set_fill_color(Color::black);
 
-    Frowny red({ 70,50 }, 30);
-    Frowny amber({ 70, 120 }, 30);
-    Smiley green({ 70, 190 }, 30);
+    const int second = 1000;
+    const int amber_delay_seconds = 1;
+    const int red_green_delay_seconds = 12;
+    const int amber_delay = amber_delay_seconds * second;
+    const int red_green_delay = red_green_delay_seconds * second;
+
+    Clock red({ 70,50 }, 30);
+    Clock amber({ 70, 120 }, 30);
+    Clock green({ 70, 190 }, 30);
 
     w.attach(r);
     w.attach(red);
     w.attach(amber);
     w.attach(green);
-    const int second = 1000;
-    const int yellow_delay = 1 * second;
-    const int red_green_delay = 12 * second;
-   
+
     while (true)
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++) // Cycle through lights 3 times
         {
-            red.set_fill_color(Color::red); 
-            w.timer_wait(red_green_delay);
-            amber.set_fill_color(Color::yellow);
-            w.timer_wait(yellow_delay);
-
-            red.set_fill_color(Color::black);
-            amber.set_fill_color(Color::black);
-            green.set_fill_color(Color::green);
-            w.timer_wait(red_green_delay);
-            amber.set_fill_color(Color::yellow);
-            green.set_fill_color(Color::black);
-            w.timer_wait(yellow_delay);
-
-            amber.set_fill_color(Color::black);
+            for (int j = 0; j < red_green_delay_seconds; j++)
+            {
+                amber.set_fill_color(Color::black);
+                green.set_fill_color(Color::black);
+                red.set_fill_color(Color::red);
+                w.timer_wait(second); // wait a second before redrawing
+            }
+            for (int j = 0; j < amber_delay_seconds; j++)
+            {
+                amber.set_fill_color(Color::yellow);
+                red.set_fill_color(Color::black);
+                green.set_fill_color(Color::black);
+                w.timer_wait(second); // wait a second before redrawing
+            }
+            for (int j = 0; j < red_green_delay_seconds; j++)
+            {
+                amber.set_fill_color(Color::black);
+                red.set_fill_color(Color::black);
+                green.set_fill_color(Color::green);
+                w.timer_wait(second); // wait a second before redrawing
+            }
         }
     }
     app.gui_main();
